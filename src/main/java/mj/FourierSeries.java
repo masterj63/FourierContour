@@ -25,6 +25,14 @@ public class FourierSeries {
         return temp.integrate() / Math.PI;
     }
 
+    double getHarmAn(int n, double t) {
+        return getAn(n) * Math.cos(n * t);
+    }
+
+    double getHarmBn(int n, double t) {
+        return getBn(n) * Math.sin(n * t);
+    }
+
     String toString(int termsCount, int precision) {
         String format = "%." + precision + "f";
         String zeros = "0.";

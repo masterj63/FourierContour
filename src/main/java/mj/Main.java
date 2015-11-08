@@ -10,6 +10,8 @@ public class Main {
 //        System.out.printf("%.6f\n", fourierSeries.getAn(0) / 2);
 //        System.out.printf("%.6f\n", Math.PI * Math.PI / 3);
 
+        System.setProperty("sun.java2d.opengl", "true");
+
         MeshFunction fun = MeshFunction.valueOf(x -> Math.abs(x), -Math.PI, Math.PI, 2000);
         FourierSeries series = FourierSeries.valueOf(fun);
         for (int i = 1; i <= 20; i++)
@@ -38,7 +40,7 @@ class Gui extends JFrame {
     Gui() {
         super("title");
         add(new GameField());
-        setSize(new Dimension(400, 400));
+        setSize(new Dimension(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT));
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setIgnoreRepaint(true);
         setResizable(false);
@@ -49,27 +51,30 @@ class Gui extends JFrame {
 
 class GameField extends JPanel {
     double alpha = 0.0d;
-    AffinePainter ap = new AffinePainter(400, 400);
+    AffinePainter ap = new AffinePainter(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT);//fix
+    MeshFunction squareMeshFunction = MeshFunction.valueOf(x -> x * x, 0, 35, 300);
+    FourierSeries squareFourierSeries = FourierSeries.valueOf(squareMeshFunction);
 
     GameField() {
         setFocusable(true);
         setDoubleBuffered(true);
-        new Timer(100, e -> repaint()).start();
+        new Timer(300, e -> repaint()).start();
     }
 
     @Override
     public void paint(Graphics g) {
         super.paint(g);
         alpha += 0.1d;
-        int r = 100;
-        int x = (int) (r * Math.cos(alpha));
-        int y = (int) (r * Math.sin(alpha));
-        ap.drawLine(g, 0, 0, x, y);
+        g.drawString(String.valueOf(alpha), 0, 20);
 
-        int rr = 40;
-        int xx = (int) (rr * Math.cos(alpha / 3.0));
-        int yy = (int) (rr * Math.sin(alpha / 3.0));
-        ap.drawLine(g, x + 0, y + 0, x + xx, y + yy);
+        double x = 0.0d, y = 0.0d;
+        for (int n = 2; n <= 30; n++) {
+            double newX = x + squareFourierSeries.getHarmAn(n, alpha);
+            double newY = y + squareFourierSeries.getHarmBn(n, alpha);
+            ap.drawLine(g, (int) x, (int) y, (int) newX, (int) newY);
+            x = newX;
+            y = newY;
+        }
     }
 }
 
